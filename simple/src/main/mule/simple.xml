@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9538f8d5-b00d-4993-bfcc-d3e29d4fae92" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="simpleFlow" doc:id="1a7f2573-bf66-4cc0-b645-f5f86ce182bd" >
+		<http:listener doc:name="Listener" doc:id="da2fbddf-8e0a-4172-9b55-560db1b4451b" config-ref="HTTP_Listener_config" path="/simple"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="3c3c45af-f32c-42f7-8c52-13dc5256a698" >
+			<route >
+				<set-variable value='#[{&#10;	"name":"aravind",&#10;	"id":5&#10;}]' doc:name="Set Variable" doc:id="354f22d0-235b-4f44-8136-6d454caf24ba" variableName="student"/>
+				<set-payload value='#[output application/json&#10;---&#10;{&#10;	"name":vars.student&#10;}]' doc:name="Set Payload" doc:id="edeaff53-66c3-45ae-8a4e-687930d9e6e4" />
+			</route>
+			<route >
+				<set-variable value='#[{&#10;	"emid" : 5,&#10;	"empname": "director"&#10;}]' doc:name="Set Variable" doc:id="af273014-eb25-482a-a954-f2ffb0644089" variableName="emp"/>
+				<set-payload value='#[output application/json&#10;---&#10;{&#10;	"emp" :vars.emp&#10;	&#10;}]' doc:name="Set Payload" doc:id="fbddb910-b9c2-45a7-87a3-1eecb14bf9ce" />
+			</route>
+			<route >
+				<flow-ref doc:name="Flow Reference" doc:id="1776533f-1940-4a91-b1ae-482619bead71" name="simpleSub_Flow"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="a1961570-1928-4baf-8fe1-ff57c0b23e49" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+
+{
+	"student": vars.student,
+	"emp" : vars.emp,
+	"collage":vars.collage
+}
+]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</flow>
+	<sub-flow name="simpleSub_Flow" doc:id="53ad5ff9-4a76-4578-be9f-0c11dbc78848" >
+		<set-variable value='#[output application/json&#10;---&#10;{&#10;	"collagename":"rise",&#10;	"collageid" :"8b"&#10;}]' doc:name="Set Variable" doc:id="41dbe595-4b6f-4d0c-b8c8-c16e7df42735" variableName="collage"/>
+	</sub-flow>
+</mule>
